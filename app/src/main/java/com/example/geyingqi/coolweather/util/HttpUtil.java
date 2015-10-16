@@ -30,6 +30,7 @@ public class HttpUtil {
                         response.append(line);
                     }
                     if (listener != null){
+
                         //回调onFinish方法
                         listener.onFinish(response.toString());
                     }

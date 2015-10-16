@@ -8,7 +8,9 @@ import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
+import com.example.geyingqi.coolweather.receiver.AutoUpdateReceiver;
 import com.example.geyingqi.coolweather.util.HttpCallbackListener;
 import com.example.geyingqi.coolweather.util.HttpUtil;
 import com.example.geyingqi.coolweather.util.Utility;
@@ -31,12 +33,6 @@ public class AutoUpdateService extends Service {
                 updateWeather();
             }
         }).start();
-        AlarmManager manager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        int anHour = 8*60*60*1000;//这个是8小时的毫秒数
-        long triggerAtTime = SystemClock.elapsedRealtime() + anHour;
-        Intent i  = new Intent(this,AutoUpdateService.class);
-        PendingIntent pi = PendingIntent.getBroadcast(this,0,i,0);
-        manager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,triggerAtTime,pi);
         return super.onStartCommand(intent,flags,startId);
     }
 
@@ -46,12 +42,17 @@ public class AutoUpdateService extends Service {
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String weatherCode = prefs.getString("weather_code", "");
+        Log.d("AutoUpdateService", "updateWeather updateWeather = " + weatherCode );
         String address = "http://www.weather.com.cn/data/cityinfo/" + weatherCode + ".html";
         HttpUtil.sendHttpRequest(address, new HttpCallbackListener() {
             @Override
             public void onFinish(String response) {
-                Utility.handleWeatherResponse(AutoUpdateService.this,response);
+                if(response.contains("weatherinfo")) {
+                    Utility.handleWeatherResponse(AutoUpdateService.this, response);
 
+                } else {
+                    onError(new Exception("该区天气无法访问"));
+                }
             }
 
             @Override

@@ -1,20 +1,27 @@
 package com.example.geyingqi.coolweather.activity;
 
 import android.app.Activity;
-import android.content.DialogInterface;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.baidu.location.BDLocation;
+import com.baidu.location.BDLocationListener;
+import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
 import com.example.geyingqi.coolweather.R;
-import com.example.geyingqi.coolweather.service.AutoUpdateService;
+import com.example.geyingqi.coolweather.receiver.AutoUpdateReceiver;
+
 import com.example.geyingqi.coolweather.util.HttpCallbackListener;
 import com.example.geyingqi.coolweather.util.HttpUtil;
 import com.example.geyingqi.coolweather.util.Utility;
@@ -50,6 +57,29 @@ public class WeatherActivity extends Activity implements View.OnClickListener {
     //更新天气按钮
     private Button refreshWeather;
 
+    //用于显示当前位置
+    private TextView location;
+
+    //StringBuilder
+    StringBuilder sb = new StringBuilder();
+
+    //初始化LocationClient类
+    public LocationClient mLocationClient = null;
+
+
+    private void initLocation(){
+        LocationClientOption option = new LocationClientOption();
+        option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);//设置定位精度
+        int span = 1000*60*60;
+        option.setScanSpan(span);
+        option.setIsNeedAddress(true);//定位详细地址
+        option.setIsNeedLocationDescribe(true);//简单描述
+        option.setIsNeedLocationPoiList(true);
+        option.setIgnoreKillProcess(true);
+        mLocationClient.setLocOption(option);
+    }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +96,31 @@ public class WeatherActivity extends Activity implements View.OnClickListener {
         currentDateText = (TextView) findViewById(R.id.current_date);
         switchCity = (Button) findViewById(R.id.switch_city);
         refreshWeather = (Button) findViewById(R.id.refresh_weather);
+        location = (TextView) findViewById(R.id.location);
+        //声明LocationClient,注册监听函数
+        mLocationClient = new LocationClient(getApplicationContext());
+        mLocationClient.registerLocationListener(new BDLocationListener(){
+            @Override
+            public void onReceiveLocation(BDLocation bdLocation) {
+
+                if (bdLocation.getLocType() == BDLocation.TypeNetWorkLocation){
+                    //网络定位结果
+
+                        sb.append("当前所在城市:");
+                        sb.append(bdLocation.getCity());
+                        location.setText(sb);
+                        Log.d("CityCode", "show the CityCode = "+bdLocation.getCityCode());
+                        sb.delete(0,sb.length());
+                        Log.d("CityStringBuiler", "show the City StringBuilder = "+sb);
+                }
+            }
+
+        });
+
+        initLocation();
+        mLocationClient.start();
+        Log.d("onCreate", "show the StringBuilder = " +sb.toString());
+
 
         String countyCode = getIntent().getStringExtra("county_code");
         if (!TextUtils.isEmpty(countyCode)){
@@ -175,10 +230,17 @@ public class WeatherActivity extends Activity implements View.OnClickListener {
         currentDateText.setText(prefs.getString("current_date", ""));
         weatherInfoLayout.setVisibility(View.VISIBLE);
         cityNameText.setVisibility(View.VISIBLE);
-        Intent intent = new Intent (this, AutoUpdateService.class);
-        startService(intent);
+        setAlarmClockRepeatBroadcast();
+//        Intent intent = new Intent (this, AutoUpdateService.class);
+//        startService(intent);
     }
 
+    private void setAlarmClockRepeatBroadcast() {
+        AlarmManager manager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        int anHour = 3*1000;
+        Intent i  = new Intent(this,AutoUpdateReceiver.class);
+        PendingIntent pi = PendingIntent.getBroadcast(this,0,i,0);
+        manager.setRepeating(AlarmManager.RTC_WAKEUP,System.currentTimeMillis(),anHour,pi);
 
-
+    }
 }
