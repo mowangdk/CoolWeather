@@ -23,7 +23,7 @@ public class SaveObjectUtil {
     * 
     * */
     
-    public static void saveObject(SharedPreferences.Editor sharedata,String key,Object obj){
+    public final static void saveObject(SharedPreferences.Editor sharedata,String key,Object obj){
         try {   
             //先将序列化的结果写入byte缓存当中,其实就是分配一个内存空间
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -43,11 +43,11 @@ public class SaveObjectUtil {
 
     }
 
-    private static String byteToHexString(byte[] bArray) {
-        if (bArray == null) {
+    private final static String byteToHexString(byte[] bArray) {
+        if (null == bArray) {
             return null;
         }
-        if (bArray.length == 0) {
+        if (0 == bArray.length) {
             return "";
         }
         StringBuffer sb = new StringBuffer();
@@ -55,7 +55,7 @@ public class SaveObjectUtil {
 
         for (int i = 0; i < bArray.length; i++) {
             sTemp = Integer.toHexString(0xFF & bArray[i]);
-            if (sTemp.length() < 2)
+            if (sTemp != null && sTemp.length() < 2)
                 sb.append(0);
             sb.append(sTemp.toUpperCase());
         }
@@ -63,7 +63,7 @@ public class SaveObjectUtil {
     }
 
 
-    public Object readObject(SharedPreferences pref,String key){
+    public final Object readObject(SharedPreferences pref,String key){
         try{
             if (pref.contains(key)){
                 String string = pref.getString(key,"");
@@ -94,7 +94,7 @@ public class SaveObjectUtil {
 
     }
 
-    private byte[] stringtoBytes(String string) {
+    private final byte[] stringtoBytes(String string) {
         String hexString = string.toUpperCase().trim();
         if (hexString.length() % 2 !=0){
             return null;

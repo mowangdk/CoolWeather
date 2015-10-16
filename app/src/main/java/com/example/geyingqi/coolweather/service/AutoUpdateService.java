@@ -1,16 +1,14 @@
 package com.example.geyingqi.coolweather.service;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
+
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.IBinder;
-import android.os.SystemClock;
+
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.example.geyingqi.coolweather.receiver.AutoUpdateReceiver;
 import com.example.geyingqi.coolweather.util.HttpCallbackListener;
 import com.example.geyingqi.coolweather.util.HttpUtil;
 import com.example.geyingqi.coolweather.util.Utility;
@@ -38,7 +36,7 @@ public class AutoUpdateService extends Service {
 
 
     //更新天气信息
-    private void updateWeather(){
+    private final void updateWeather(){
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String weatherCode = prefs.getString("weather_code", "");

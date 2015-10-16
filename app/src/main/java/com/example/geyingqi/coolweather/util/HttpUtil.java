@@ -11,7 +11,7 @@ import java.net.URL;
  * Created by geyingqi on 10/9/15.
  */
 public class HttpUtil {
-    public static void sendHttpRequest(final String address,final HttpCallbackListener listener){
+    public final static void sendHttpRequest(final String address,final HttpCallbackListener listener){
         new Thread(new Runnable() {
             @Override
             public void run() {

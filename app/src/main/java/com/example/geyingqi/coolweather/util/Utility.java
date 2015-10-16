@@ -28,7 +28,7 @@ import java.util.Locale;
  */
 public class Utility {
     //处理和解析服务器返回的省级数据
-    public synchronized static boolean handleProvinceResponse(CoolWeatherDB coolWeatherDB,String response){
+    public final synchronized static boolean handleProvinceResponse(CoolWeatherDB coolWeatherDB,String response){
         if (!TextUtils.isEmpty(response)){
             String[] allProvinces = response.split(",");
             if (allProvinces != null && allProvinces.length > 0){
@@ -49,7 +49,7 @@ public class Utility {
 
 
     //处理和解析服务器返回的市级数据
-    public static boolean handleCitiesResponse(CoolWeatherDB coolWeatherDB,String response,int provinceId){
+    public final static boolean handleCitiesResponse(CoolWeatherDB coolWeatherDB,String response,int provinceId){
         if (! TextUtils.isEmpty(response)){
             String[] allCities = response.split(",");
             if (allCities != null && allCities.length > 0){
@@ -71,7 +71,7 @@ public class Utility {
 
 
     //处理县级数据
-    public static boolean handleCountiesResponse (CoolWeatherDB coolWeatherDB, String response,int cityId){
+    public final static boolean handleCountiesResponse (CoolWeatherDB coolWeatherDB, String response,int cityId){
         if (!TextUtils.isEmpty(response)){
             String[] allCounties = response.split(",");
             if (allCounties != null && allCounties.length > 0){
@@ -93,7 +93,7 @@ public class Utility {
 
     //解析服务器返回的JSON数据,并将解析出的数据存储到本地
 
-    public static void handleWeatherResponse(Context context,String response)  {
+    public final static void handleWeatherResponse(Context context,String response)  {
         Log.d("Utility", "show the response = " + response);
         Gson gson = new Gson();
         Type type = new TypeToken<Weather>(){}.getType();
@@ -142,7 +142,7 @@ public class Utility {
 
     //将服务器返回的所有天气信息存储到SharedPreferences文件中
 
-    private static void saveWeatherInfo(Context context, Weather.WeatherInfo weather) {
+    private final static void saveWeatherInfo(Context context, Weather.WeatherInfo weather) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy年M月d日", Locale.CHINA);
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
         editor.putBoolean("city_selected", true);

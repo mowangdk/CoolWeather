@@ -37,15 +37,15 @@ public class CoolWeatherDB {
     }
 
     //获取当前类的实例
-    public synchronized static CoolWeatherDB getInstance(Context context){
-        if (coolWeatherDB == null){
+    public final synchronized static CoolWeatherDB getInstance(Context context){
+        if (null == coolWeatherDB){
             coolWeatherDB = new CoolWeatherDB(context);
         }
         return coolWeatherDB;
     }
 
     //将Province实例存储到数据库
-    public void saveProvince(Province province){
+    public final void saveProvince(Province province){
         if (province != null){
             ContentValues values = new ContentValues();
             values.put("province_name",province.getProvinceName());
@@ -55,7 +55,7 @@ public class CoolWeatherDB {
     }
 
     //从数据库读取全国所有的省份信息
-    public List<Province> loadProvinces(){
+    public final List<Province> loadProvinces(){
         List<Province> list = new ArrayList<Province>();
         Cursor cursor = db.query("Province",null,null,null,null,null,null);
         if(cursor.moveToFirst()){
@@ -72,7 +72,7 @@ public class CoolWeatherDB {
     }
 
     //将city实例存储在数据库中
-    public void saveCity(City city){
+    public final void saveCity(City city){
         if (city != null){
             ContentValues values = new ContentValues();
             values.put("city_name", city.getCityName());
@@ -84,7 +84,7 @@ public class CoolWeatherDB {
 
 
     //从数据库读取某省下所有的城市信息
-    public List<City> loadCities(int provinceId){
+    public final List<City> loadCities(int provinceId){
         List<City> list = new ArrayList<City>();
         Cursor cursor = db.query("City",null,"province_id = ?",new String[]{String.valueOf(provinceId)},null,null,null);
         if (cursor.moveToFirst()){
@@ -102,7 +102,7 @@ public class CoolWeatherDB {
     }
 
     //将county实例存入数据库
-    public void saveCounty(County county){
+    public final void saveCounty(County county){
         if (county != null){
             ContentValues values = new ContentValues();
             values.put("county_name", county.getCountyName());
@@ -113,7 +113,7 @@ public class CoolWeatherDB {
     }
 
     //从数据库中读取某城市下的所有县信息
-    public List<County> loadCountis(int cityId){
+    public final List<County> loadCountis(int cityId){
         List<County> list = new ArrayList<County>();
         Cursor cursor = db.query("County", null, "city_id = ?",
                 new String[] { String.valueOf(cityId) }, null, null, null);

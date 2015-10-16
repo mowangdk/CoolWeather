@@ -67,7 +67,7 @@ public class WeatherActivity extends Activity implements View.OnClickListener {
     public LocationClient mLocationClient = null;
 
 
-    private void initLocation(){
+    private final void initLocation(){
         LocationClientOption option = new LocationClientOption();
         option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);//设置定位精度
         int span = 1000*60*60;
@@ -103,7 +103,7 @@ public class WeatherActivity extends Activity implements View.OnClickListener {
             @Override
             public void onReceiveLocation(BDLocation bdLocation) {
 
-                if (bdLocation.getLocType() == BDLocation.TypeNetWorkLocation){
+                if (BDLocation.TypeNetWorkLocation == bdLocation.getLocType()){
                     //网络定位结果
 
                         sb.append("当前所在城市:");
@@ -141,41 +141,44 @@ public class WeatherActivity extends Activity implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         switch (v.getId()){
-            case R.id.switch_city:
+            case R.id.switch_city:{
                 Intent intent = new Intent(this,ChooseAreaActivity.class);
                 intent.putExtra("from_weather_activity", true);
                 startActivity(intent);
                 finish();
                 break;
-            case R.id.refresh_weather:
+            }
+            case R.id.refresh_weather: {
                 publishText.setText("同步中.....");
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
                 String weatherCode = prefs.getString("weather_code", "");
-                if (!TextUtils.isEmpty(weatherCode)){
+                if (!TextUtils.isEmpty(weatherCode)) {
                     queryWeatherInfo(weatherCode);
                 }
                 break;
-            default:
+            }
+            default: {
                 break;
+            }
         }
     }
 
 
 
     //查询县级代号所对应的天气代号
-    private void queryWeatherCode(String countyCode){
+    private final void queryWeatherCode(String countyCode){
         String address = "http://www.weather.com.cn/data/list3/city" + countyCode + ".xml";
         queryFromServer(address, "countyCode");
     }
 
     //查询天气代号所对应的天气
-    private void queryWeatherInfo(String weatherCode){
+    private final void queryWeatherInfo(String weatherCode){
         String address = "http://www.weather.com.cn/data/cityinfo/" + weatherCode + ".html";
         queryFromServer(address, "weatherCode");
     }
 
     //根据传入的地址和类型去向服务器查询天气代号或者天气信息
-    private void queryFromServer(final String address,final String type){
+    private final void queryFromServer(final String address,final String type){
 
         HttpUtil.sendHttpRequest(address, new HttpCallbackListener() {
             @Override
@@ -220,7 +223,7 @@ public class WeatherActivity extends Activity implements View.OnClickListener {
 
 
     //从SharedPreferences 文件中读取存储的天气信息,并且显示到界面上
-    private void showWeather(){
+    private final void showWeather(){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         cityNameText.setText( prefs.getString("city_name", ""));
         temp1Text.setText(prefs.getString("temp1", ""));
@@ -235,7 +238,7 @@ public class WeatherActivity extends Activity implements View.OnClickListener {
 //        startService(intent);
     }
 
-    private void setAlarmClockRepeatBroadcast() {
+    private final void setAlarmClockRepeatBroadcast() {
         AlarmManager manager = (AlarmManager) getSystemService(ALARM_SERVICE);
         int anHour = 3*1000;
         Intent i  = new Intent(this,AutoUpdateReceiver.class);

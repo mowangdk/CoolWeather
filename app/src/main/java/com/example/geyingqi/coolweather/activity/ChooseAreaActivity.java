@@ -90,13 +90,13 @@ public class ChooseAreaActivity extends Activity {
         listView.setOnItemClickListener(new OnItemClickListener(){
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (currentLevel == LEVEL_PROVINCE) {
+                if (LEVEL_PROVINCE == currentLevel) {
                     selectedProvince = provinceList.get(position);
                     queryCities();
-                } else if (currentLevel == LEVEL_CITY) {
+                } else if (LEVEL_CITY == currentLevel) {
                     selectedCity = cityList.get(position);
                     queryCounties();
-                } else if (currentLevel == LEVEL_COUNTY){
+                } else if (LEVEL_COUNTY == currentLevel){
                     String countyCode = countyList.get(position).getCountyCode();
                     Intent intent = new Intent (ChooseAreaActivity.this,WeatherActivity.class);
                     intent.putExtra("county_code",countyCode);
@@ -117,7 +117,7 @@ public class ChooseAreaActivity extends Activity {
     * 因此调用queryProvinces() 就会直接将数据显示到页面上了
     *
     * */
-    private void queryProvinces(){
+    private final void queryProvinces(){
         provinceList = coolWeatherDB.loadProvinces();
         if (provinceList.size() > 0){
             dataList.clear();
@@ -135,7 +135,7 @@ public class ChooseAreaActivity extends Activity {
 
 
     //查询选中省内所有的市,优先从数据库中查询
-    private void queryCities(){
+    private final void queryCities(){
         cityList = coolWeatherDB.loadCities(selectedProvince.getId());
         if (cityList.size() > 0){
             dataList.clear();
@@ -154,7 +154,7 @@ public class ChooseAreaActivity extends Activity {
 
 
     //查询选中市内所有的县,优先从数据库查询,如果没有查询到再去服务器上查询
-    private void queryCounties(){
+    private final void queryCounties(){
         countyList = coolWeatherDB.loadCountis(selectedCity.getId());
         if (countyList.size() > 0){
             dataList.clear();
@@ -172,7 +172,7 @@ public class ChooseAreaActivity extends Activity {
     }
 
     //根据传入的代号和类型从服务器上查询省市县数据
-    private void queryFromServer(final String code,final String type){
+    private final void queryFromServer(final String code,final String type){
         String address;
         if (!TextUtils.isEmpty(code)){
             address =  "http://www.weather.com.cn/data/list3/city" + code + ".xml";
@@ -230,8 +230,8 @@ public class ChooseAreaActivity extends Activity {
 
     //显示进度对话框
 
-    private void showProgressDialog(){
-        if (progressDialog == null){
+    private final void showProgressDialog(){
+        if (null == progressDialog ){
             progressDialog = new ProgressDialog(this);
             progressDialog.setMessage("正在加载.......");
             progressDialog.setCanceledOnTouchOutside(false);
@@ -240,8 +240,8 @@ public class ChooseAreaActivity extends Activity {
     }
 
     //关闭进度对话框
-    private void closeProgressDialog(){
-        if (progressDialog != null){
+    private final void closeProgressDialog(){
+        if (null != progressDialog){
             progressDialog.dismiss();
         }
     }
@@ -252,9 +252,9 @@ public class ChooseAreaActivity extends Activity {
     //返回市级列表还是省级列表还是直接退出
     @Override
     public void onBackPressed(){
-        if (currentLevel == LEVEL_COUNTY){
+        if (LEVEL_COUNTY == currentLevel){
             queryCities();
-        } else if (currentLevel == LEVEL_CITY){
+        } else if (LEVEL_CITY == currentLevel){
             queryProvinces();
         } else {
            if (isFromWeatherActivity){
@@ -266,20 +266,5 @@ public class ChooseAreaActivity extends Activity {
 
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }
