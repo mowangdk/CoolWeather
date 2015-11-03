@@ -22,6 +22,7 @@ import com.baidu.location.LocationClientOption;
 import com.example.geyingqi.coolweather.R;
 import com.example.geyingqi.coolweather.receiver.AutoUpdateReceiver;
 
+import com.example.geyingqi.coolweather.service.MyListener;
 import com.example.geyingqi.coolweather.util.HttpCallbackListener;
 import com.example.geyingqi.coolweather.util.HttpUtil;
 import com.example.geyingqi.coolweather.util.Utility;
@@ -60,12 +61,17 @@ public class WeatherActivity extends Activity implements View.OnClickListener {
     //用于显示当前位置
     private TextView location;
 
-    //StringBuilder
-    StringBuilder sb = new StringBuilder();
+//  StringBuilder
+//  StringBuilder sb;
 
     //初始化LocationClient类
     public LocationClient mLocationClient = null;
 
+    //进入手机地图
+    public Button map;
+
+    //自定义监听器
+    MyListener myListener;
 
     private final void initLocation(){
         LocationClientOption option = new LocationClientOption();
@@ -97,31 +103,12 @@ public class WeatherActivity extends Activity implements View.OnClickListener {
         switchCity = (Button) findViewById(R.id.switch_city);
         refreshWeather = (Button) findViewById(R.id.refresh_weather);
         location = (TextView) findViewById(R.id.location);
+        myListener = new MyListener(location);
+        map = (Button) findViewById(R.id.button);
+        map.setText("切换至地图");
         //声明LocationClient,注册监听函数
         mLocationClient = new LocationClient(getApplicationContext());
-        mLocationClient.registerLocationListener(new BDLocationListener(){
-            @Override
-            public void onReceiveLocation(BDLocation bdLocation) {
-
-                if (BDLocation.TypeNetWorkLocation == bdLocation.getLocType()){
-                    //网络定位结果
-
-                        sb.append("当前所在城市:");
-                        sb.append(bdLocation.getCity());
-                        location.setText(sb);
-                        Log.d("CityCode", "show the CityCode = "+bdLocation.getCityCode());
-                        sb.delete(0,sb.length());
-                        Log.d("CityStringBuiler", "show the City StringBuilder = "+sb);
-                }
-            }
-
-        });
-
-        initLocation();
-        mLocationClient.start();
-        Log.d("onCreate", "show the StringBuilder = " +sb.toString());
-
-
+        mLocationClient.registerLocationListener(myListener);
         String countyCode = getIntent().getStringExtra("county_code");
         if (!TextUtils.isEmpty(countyCode)){
             //有区级代号的时候就去查询天气
@@ -136,6 +123,18 @@ public class WeatherActivity extends Activity implements View.OnClickListener {
         }
         switchCity.setOnClickListener(this);
         refreshWeather.setOnClickListener(this);
+        map.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(WeatherActivity.this,MapActivity.class);
+                intent.putExtra("latitude", myListener.getLatitude());
+                intent.putExtra("longitude",myListener.getLongitude());
+                intent.putExtra("radius",myListener.getRadius());
+                startActivity(intent);
+            }
+        });
+        initLocation();
+        mLocationClient.start();
     }
 
     @Override
